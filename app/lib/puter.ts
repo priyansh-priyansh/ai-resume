@@ -94,12 +94,17 @@ interface PuterStore {
 
   init: () => void;
   clearError: () => void;
+  getFileCount: (path?: string) => Promise<number>;
 }
 
 const getPuter = (): typeof window.puter | null =>
   typeof window !== "undefined" && window.puter ? window.puter : null;
 
 export const usePuterStore = create<PuterStore>((set, get) => {
+  const getFileCount = async (path: string = "./") => {
+    const files = await get().fs.readDir(path);
+    return files ? files.length : 0;
+  };
   const setError = (msg: string) => {
     set({
       error: msg,
@@ -350,7 +355,7 @@ export const usePuterStore = create<PuterStore>((set, get) => {
           ],
         },
       ],
-      { model: ""}
+      { model: "" }
     ) as Promise<AIResponse | undefined>;
   };
 
@@ -452,5 +457,6 @@ export const usePuterStore = create<PuterStore>((set, get) => {
     },
     init,
     clearError: () => set({ error: null }),
+    getFileCount,
   };
 });
